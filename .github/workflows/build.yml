@@ -20,11 +20,9 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
-    - name: Change to project directory
-      run: cd src/Jellyfin.Plugin.Referenceable
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore src/Jellyfin.Plugin.Referenceable/Jellyfin.Plugin.Referenceable.csproj
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build src/Jellyfin.Plugin.Referenceable/Jellyfin.Plugin.Referenceable.csproj --no-restore
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test src/Jellyfin.Plugin.Referenceable/Jellyfin.Plugin.Referenceable.csproj --no-build --verbosity normal
