@@ -37,7 +37,7 @@
     </ItemGroup>
     
     <Target Name="NuGetOutputCopy" AfterTargets="Pack">
-        <Exec Command="copy $(OutDir)..\$(ProjectName).*.nupkg $(SolutionDir)nuget-packages\" />
+        <Exec Command="copy $(OutDir)..\$(ProjectName).*.nupkg $(SolutionDir)nuget-packages\" Condition="Exists($(SolutionDir))" />
     </Target>
 
 </Project>
