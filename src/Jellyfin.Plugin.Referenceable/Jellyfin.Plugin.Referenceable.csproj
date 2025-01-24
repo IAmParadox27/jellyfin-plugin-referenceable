@@ -8,6 +8,10 @@
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
         <IncludePackageReferencesDuringMarkupCompilation>true</IncludePackageReferencesDuringMarkupCompilation>
+        <PackageProjectUrl>https://projects.iamparadox.dev/en/jellyfin-plugins/referenceable</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/IAmParadox27/jellyfin-plugin-referenceable</RepositoryUrl>
+        <RepositoryType>GitHub</RepositoryType>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
 
     <ItemGroup>
@@ -24,7 +28,7 @@
 
     <ItemGroup>
       <Compile Remove="ModuleInitializer.cs" />
-      
+      <None Include="..\..\README.md" Pack="true" PackagePath="/" />
       <None Include="Jellyfin.Plugin.Referenceable.targets" Pack="true" PackagePath="build/net8.0" />
       <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     </ItemGroup>
@@ -37,6 +41,7 @@
     </ItemGroup>
     
     <Target Name="NuGetOutputCopy" AfterTargets="Pack">
+        <!-- This command is just useful to ensure that all nupkg files are in the same place to make it easier to reference them from 1 local dir. -->
         <Exec Command="copy $(OutDir)..\$(ProjectName).*.nupkg $(SolutionDir)nuget-packages\" Condition="Exists($(SolutionDir))" />
     </Target>
 
