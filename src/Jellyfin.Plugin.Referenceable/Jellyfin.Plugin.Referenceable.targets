@@ -1,0 +1,31 @@
+﻿<Project>
+    <ItemGroup>
+        <PackageReference Include="Jellyfin.Model" Version="10.10.3" />
+
+        <PackageReference Include="ILRepack.Lib.MSBuild.Task" Version="2.0.34.2" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+
+        <PackageReference Include="Microsoft.NetCore.App.Ref" Version="8.0.0" ExcludeAssets="all" PrivateAssets="all" GeneratePathProperty="true" />
+    </ItemGroup>
+    
+    <!-- This is where we use ILRepack -->
+    <Target Name="ILRepacker" AfterTargets="Build">
+        <ItemGroup>
+            <InputAssemblies Include="$(OutputPath)\*.dll" />
+        </ItemGroup>
+        <ItemGroup>
+            <LibraryPath Include="$(PkgMicrosoft_NetCore_App_Ref)\ref\net8.0" />
+        </ItemGroup>
+        <ILRepack
+            InputAssemblies="@(InputAssemblies)"
+            LibraryPath="@(LibraryPath)"
+            OutputFile="$(OutputPath)..\$(AssemblyName).dll"
+            CopyAttributes="false"
+            XmlDocumentation="true"
+            Internalize="true"
+            Parallel="true"
+            TargetKind="Dll"
+            Wildcards="true"
+        />
+    </Target>
+</Project>
