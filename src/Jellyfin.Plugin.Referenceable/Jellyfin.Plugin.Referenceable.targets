@@ -1,16 +1,17 @@
 ﻿<Project>
+    <PropertyGroup>
+        <JellyfinVersion>10.10.3</JellyfinVersion>
+    </PropertyGroup>
+    
     <ItemGroup>
-        <PackageReference Include="Jellyfin.Model" Version="10.10.3" />
+        <PackageReference Include="Jellyfin.Model" Version="$(JellyfinVersion)" />
+        <PackageReference Include="Jellyfin.Controller" Version="$(JellyfinVersion)" />
 
         <PackageReference Include="ILRepack.Lib.MSBuild.Task" Version="2.0.34.2" PrivateAssets="all" />
         <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
 
         <PackageReference Include="Microsoft.NetCore.App.Ref" Version="8.0.0" ExcludeAssets="all" PrivateAssets="all" GeneratePathProperty="true" />
     </ItemGroup>
-    
-    <PropertyGroup>
-        <JellyfinVersion>10.10.3</JellyfinVersion>
-    </PropertyGroup>
     
     <!-- This is where we use ILRepack -->
     <Target Name="ILRepacker" AfterTargets="Build">
