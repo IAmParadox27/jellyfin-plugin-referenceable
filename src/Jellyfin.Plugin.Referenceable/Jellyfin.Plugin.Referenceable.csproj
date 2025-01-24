@@ -10,18 +10,7 @@
         <IncludePackageReferencesDuringMarkupCompilation>true</IncludePackageReferencesDuringMarkupCompilation>
     </PropertyGroup>
 
-<!--    <ItemGroup>-->
-<!--      <ProjectReference Include="..\..\jellyfin-plugin-common\Jellyfin.Plugin.Common\Jellyfin.Plugin.Common.csproj" />-->
-<!--    </ItemGroup>-->
-
     <ItemGroup>
-      <Reference Include="Emby.Server.Implementations">
-        <HintPath>C:\Program Files\Jellyfin\Server\Emby.Server.Implementations.dll</HintPath>
-      </Reference>
-    </ItemGroup>
-
-    <ItemGroup>
-      <PackageReference Include="Jellyfin.Controller" Version="10.10.3" />
       <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.12.0" PrivateAssets="all" />
       <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.12.0" PrivateAssets="all" />
 

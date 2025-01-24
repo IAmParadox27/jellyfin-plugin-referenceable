@@ -8,6 +8,10 @@
         <PackageReference Include="Microsoft.NetCore.App.Ref" Version="8.0.0" ExcludeAssets="all" PrivateAssets="all" GeneratePathProperty="true" />
     </ItemGroup>
     
+    <PropertyGroup>
+        <JellyfinVersion>10.10.3</JellyfinVersion>
+    </PropertyGroup>
+    
     <!-- This is where we use ILRepack -->
     <Target Name="ILRepacker" AfterTargets="Build">
         <ItemGroup>
