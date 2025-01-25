@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.Loader;
+using System.Collections.Generic;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,7 +11,41 @@ namespace {{namespace}}.Generated
 #nullable enable
     public class ModuleInitializer
     {
+        internal class EmbeddedAssemblyData
+        {
+            public Assembly ContainingAssembly { get; set; }
+            public string ManifestResourceName { get; set; }
+            public string FilePath { get; set; }
+        }
+        
         public static bool IsAvailable { get; set; } = false;
+        
+        private static Dictionary<string, EmbeddedAssemblyData> s_assemblyCache = new Dictionary<string, EmbeddedAssemblyData>();
+
+        public static void RegisterAssembly(string assemblyName, Assembly assembly, string manifestResourceName)
+        {
+            if (s_assemblyCache.ContainsKey(assemblyName))
+            {
+                bool originalCollectible = AssemblyLoadContext.GetLoadContext(s_assemblyCache[assemblyName].ContainingAssembly).IsCollectible;
+                bool newCollectible = AssemblyLoadContext.GetLoadContext(assembly).IsCollectible;
+
+                if (!originalCollectible && newCollectible)
+                {
+                    s_assemblyCache[assemblyName].ContainingAssembly = assembly;
+                    s_assemblyCache[assemblyName].ManifestResourceName = manifestResourceName;
+                    s_assemblyCache[assemblyName].FilePath = assembly.Location;
+                }
+            }
+            else if (assembly != null)
+            {
+                s_assemblyCache.Add(assemblyName, new EmbeddedAssemblyData
+                {
+                    ContainingAssembly = assembly,
+                    ManifestResourceName = manifestResourceName,
+                    FilePath = assembly.Location
+                });
+            }
+        }
         
         [ModuleInitializer]
         public static void Init()
@@ -63,6 +98,14 @@ namespace {{namespace}}.Generated
 
         private static Assembly? ResolveAssembly(object? sender, ResolveEventArgs args)
         {
+            AssemblyLoadContext thisLoadContext = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly())!;
+            
+            if (s_assemblyCache.ContainsKey(args.Name))
+            {
+                Stream? manifest = s_assemblyCache[args.Name].ContainingAssembly.GetManifestResourceStream(s_assemblyCache[args.Name].ManifestResourceName);
+                return thisLoadContext.LoadFromStream(manifest);
+            }
+            
             return null;
         }
 
