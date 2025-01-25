@@ -8,6 +8,11 @@ namespace Jellyfin.Plugin.Referenceable.Services
 {
     public abstract class PluginServiceRegistrator : IPluginServiceRegistrator
     {
+        public PluginServiceRegistrator()
+        {
+            
+        }
+        
         public void RegisterServices(IServiceCollection serviceCollection, IServerApplicationHost applicationHost)
         {
             // This is likely going to be the wrong assembly so we need to call into the correct assembly first.
@@ -17,7 +22,7 @@ namespace Jellyfin.Plugin.Referenceable.Services
             }
             else
             {
-                dynamic registrator = ModuleInitializer.CreateReferenceableObject<PluginServiceRegistrator>();
+                dynamic registrator = ModuleInitializer.CreateReferenceableObject(GetType());
 
                 registrator.RegisterServices(serviceCollection, applicationHost);
             }

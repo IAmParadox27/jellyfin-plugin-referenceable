@@ -24,17 +24,27 @@ namespace {{namespace}}.Generated
                 // Its not collectible anyway.
                 AssemblyLoadContext newLoadContext = AssemblyLoadContext.All.FirstOrDefault(x => x.Name == "Jellyfin.Plugin.Referenceable") ?? new AssemblyLoadContext("Jellyfin.Plugin.Referenceable");
                 
-                MethodInfo? methodGetRawBytes = Assembly.GetExecutingAssembly().GetType().GetMethod("GetRawBytes", BindingFlags.Instance | BindingFlags.NonPublic);
-                if (methodGetRawBytes != null)
+                if (File.Exists(typeof(ModuleInitializer).Assembly.Location))
                 {
-                    byte[]? assemblyBytes = methodGetRawBytes.Invoke(null, null) as byte[];
-
-                    if (assemblyBytes != null)
+                    newLoadContext.LoadFromAssemblyPath(typeof(ModuleInitializer).Assembly.Location);
+                }
+                else
+                {
+                    // This approach actually doesn't work, but this is here
+                    // to remind me that I need to figure out some way of
+                    // getting the bytes for all assemblies... somehow.
+                    MethodInfo? methodGetRawBytes = Assembly.GetExecutingAssembly().GetType().GetMethod("GetRawBytes", BindingFlags.Instance | BindingFlags.NonPublic);
+                    if (methodGetRawBytes != null)
                     {
-                        MemoryStream memoryStream = new MemoryStream(assemblyBytes);
-                        memoryStream.Seek(0, SeekOrigin.Begin);
-                    
-                        newLoadContext.LoadFromStream(memoryStream);
+                        byte[]? assemblyBytes = methodGetRawBytes.Invoke(null, null) as byte[];
+
+                        if (assemblyBytes != null)
+                        {
+                            MemoryStream memoryStream = new MemoryStream(assemblyBytes);
+                            memoryStream.Seek(0, SeekOrigin.Begin);
+
+                            newLoadContext.LoadFromStream(memoryStream);
+                        }
                     }
                 }
 
@@ -55,8 +65,13 @@ namespace {{namespace}}.Generated
         {
             return null;
         }
-        
+
         public static dynamic? CreateReferenceableObject<T>(params object?[]? args)
+        {
+            return CreateReferenceableObject(typeof(T), args);
+        }
+        
+        public static dynamic? CreateReferenceableObject(Type type, params object?[]? args)
         {
             AssemblyLoadContext? loadContext = AssemblyLoadContext.All.FirstOrDefault(x => x.Name == "Jellyfin.Plugin.Referenceable");
 
@@ -65,7 +80,7 @@ namespace {{namespace}}.Generated
                 throw new KeyNotFoundException(@"Could not find Jellyfin.Plugin.Referenceable as an AssemblyLoadContext");
             }
             
-            Type? referenceableType = loadContext.Assemblies.SelectMany(x => x.GetTypes()).FirstOrDefault(x => x.FullName == typeof(T).FullName);
+            Type? referenceableType = loadContext.Assemblies.SelectMany(x => x.GetTypes()).FirstOrDefault(x => x.FullName == type.FullName);
 
             if (referenceableType == null)
             {
@@ -74,8 +89,13 @@ namespace {{namespace}}.Generated
             
             return Activator.CreateInstance(referenceableType, args);
         }
-        
+
         public static dynamic? CreateReferenceableObject<T>(IServiceProvider serviceProvider, params object[]? args)
+        {
+            return CreateReferenceableObject(typeof(T), serviceProvider, args);
+        }
+        
+        public static dynamic? CreateReferenceableObject(Type type, IServiceProvider serviceProvider, params object[]? args)
         {
             AssemblyLoadContext? loadContext = AssemblyLoadContext.All.FirstOrDefault(x => x.Name == "Jellyfin.Plugin.Referenceable");
 
@@ -84,7 +104,7 @@ namespace {{namespace}}.Generated
                 throw new KeyNotFoundException(@"Could not find Jellyfin.Plugin.Referenceable as an AssemblyLoadContext");
             }
             
-            Type? referenceableType = loadContext.Assemblies.SelectMany(x => x.GetTypes()).FirstOrDefault(x => x.FullName == typeof(T).FullName);
+            Type? referenceableType = loadContext.Assemblies.SelectMany(x => x.GetTypes()).FirstOrDefault(x => x.FullName == type.FullName);
             
             if (referenceableType == null)
             {
