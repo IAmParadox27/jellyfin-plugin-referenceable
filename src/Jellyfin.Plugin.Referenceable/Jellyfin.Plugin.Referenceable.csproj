@@ -12,6 +12,7 @@
         <RepositoryUrl>https://github.com/IAmParadox27/jellyfin-plugin-referenceable</RepositoryUrl>
         <RepositoryType>GitHub</RepositoryType>
         <PackageReadmeFile>README.md</PackageReadmeFile>
+        <Version>1.0.1</Version>
     </PropertyGroup>
 
     <ItemGroup>

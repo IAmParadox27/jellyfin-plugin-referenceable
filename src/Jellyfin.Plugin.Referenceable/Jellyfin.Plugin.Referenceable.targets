@@ -21,13 +21,13 @@
         <ItemGroup>
             <LibraryPath Include="$(PkgMicrosoft_NetCore_App_Ref)\ref\net8.0" />
         </ItemGroup>
-        <ILRepack
+        <ILRepack Condition="$(EnableRepack) != 'false'"
             InputAssemblies="@(InputAssemblies)"
             LibraryPath="@(LibraryPath)"
-            OutputFile="$(OutputPath)..\$(AssemblyName).dll"
+            OutputFile="$(OutputPath)\$(AssemblyName).dll"
+            DebugInfo="true"
             CopyAttributes="false"
             XmlDocumentation="true"
-            Internalize="true"
             Parallel="true"
             TargetKind="Dll"
             Wildcards="true"
