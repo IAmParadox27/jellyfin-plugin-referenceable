@@ -116,6 +116,11 @@ namespace {{namespace}}.Generated
         
         public static dynamic? CreateReferenceableObject(Type type, params object?[]? args)
         {
+            if (!IsAvailable)
+            {
+                Init();
+            }
+
             AssemblyLoadContext? loadContext = AssemblyLoadContext.All.FirstOrDefault(x => x.Name == "Jellyfin.Plugin.Referenceable");
 
             if (loadContext == null)
@@ -140,6 +145,11 @@ namespace {{namespace}}.Generated
         
         public static dynamic? CreateReferenceableObject(Type type, IServiceProvider serviceProvider, params object[]? args)
         {
+            if (!IsAvailable)
+            {
+                Init();
+            }
+            
             AssemblyLoadContext? loadContext = AssemblyLoadContext.All.FirstOrDefault(x => x.Name == "Jellyfin.Plugin.Referenceable");
 
             if (loadContext == null)
