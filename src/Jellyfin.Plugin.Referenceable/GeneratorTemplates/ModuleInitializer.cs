@@ -161,6 +161,15 @@ namespace {{namespace}}.Generated
 
             return ActivatorUtilities.CreateInstance(serviceProvider, referenceableType, args);
         }
+
+        public static Type? GetReferenceableType<T>()
+        {
+            return AssemblyLoadContext.All
+                .SelectMany(x => x.Assemblies)
+                .Where(x => !x.IsCollectible)
+                .SelectMany(x => x.GetTypes())
+                .FirstOrDefault(x => x.FullName == typeof(T).FullName);
+        }
     }
 #nullable restore
 }
