@@ -7,7 +7,6 @@
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-        <IncludePackageReferencesDuringMarkupCompilation>true</IncludePackageReferencesDuringMarkupCompilation>
         <PackageProjectUrl>https://projects.iamparadox.dev/en/jellyfin-plugins/referenceable</PackageProjectUrl>
         <RepositoryUrl>https://github.com/IAmParadox27/jellyfin-plugin-referenceable</RepositoryUrl>
         <RepositoryType>GitHub</RepositoryType>
@@ -16,15 +15,26 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.12.0" PrivateAssets="all" />
+      <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.12.0" PrivateAssets="all" GeneratePathProperty="true" />
       <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.12.0" PrivateAssets="all" />
-
+      
+      <PackageReference Include="Lib.Harmony.Fork" Version="2.3.3" GeneratePathProperty="true" />
+        
       <PackageReference Include="MSBuildTasks" Version="1.5.0.235">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
 
       <PackageReference Include="Jellyfin.Model" Version="10.10.3" />
+      <PackageReference Include="Jellyfin.Controller" Version="10.10.3" PrivateAssets="All" />
+      <Reference Include="Emby.Server.Implementations">
+        <HintPath>libs\Jellyfin\Emby.Server.Implementations.dll</HintPath>
+      </Reference>
+
+      <Reference Include="jellyfin">
+        <HintPath>libs\Jellyfin\jellyfin.dll</HintPath>
+        <Private>False</Private>
+      </Reference>
     </ItemGroup>
 
     <ItemGroup>
@@ -39,6 +49,9 @@
       <Compile Remove="GeneratorTemplates\ModuleInitializer.cs" />
       <EmbeddedResource Include="GeneratorTemplates\ServiceRegistrator.cs" />
       <Compile Remove="GeneratorTemplates\ServiceRegistrator.cs" />
+
+      <EmbeddedResource Include="$(PkgLib_Harmony_Fork)\lib\net8.0\0Harmony.dll" />
+      <EmbeddedResource Include="$(PkgMicrosoft_CodeAnalysis_Common)\lib\net8.0\Microsoft.CodeAnalysis.dll" />
     </ItemGroup>
     
     <Target Name="NuGetOutputCopy" AfterTargets="Pack">

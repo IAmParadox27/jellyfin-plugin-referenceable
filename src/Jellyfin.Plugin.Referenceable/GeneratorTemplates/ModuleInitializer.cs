@@ -3,7 +3,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.Loader;
 using System.Collections.Generic;
-
+using System.Diagnostics; 
 using Microsoft.Extensions.DependencyInjection;
 
 namespace {{namespace}}.Generated
@@ -24,6 +24,25 @@ namespace {{namespace}}.Generated
 
         public static void RegisterAssembly(string assemblyName, Assembly assembly, string manifestResourceName)
         {
+            if (!IsAvailable)
+            {
+                Init();
+            }
+
+            if (AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly()).IsCollectible)
+            {
+                AssemblyLoadContext nonCollectibleContext = AssemblyLoadContext.All.FirstOrDefault(x =>
+                    x.Name == typeof(ModuleInitializer).Assembly.FullName && !x.IsCollectible);
+
+                Type thisType = nonCollectibleContext.Assemblies.SelectMany(x => x.GetTypes())
+                    .FirstOrDefault(x => x.Name == nameof(ModuleInitializer));
+
+                MethodInfo thisMethod = thisType.GetMethod(nameof(RegisterAssembly), BindingFlags.Static | BindingFlags.Public);
+                thisMethod.Invoke(null, new object[] { assemblyName, assembly, manifestResourceName });
+                
+                return;
+            }
+            
             if (s_assemblyCache.ContainsKey(assemblyName))
             {
                 bool originalCollectible = AssemblyLoadContext.GetLoadContext(s_assemblyCache[assemblyName].ContainingAssembly).IsCollectible;
@@ -50,7 +69,7 @@ namespace {{namespace}}.Generated
         [ModuleInitializer]
         public static void Init()
         {
-            AssemblyLoadContext? loadContext = AssemblyLoadContext.GetLoadContext(typeof(ModuleInitializer).Assembly) as AssemblyLoadContext;
+            AssemblyLoadContext? loadContext = AssemblyLoadContext.GetLoadContext(typeof({{namespace}}.Generated.ModuleInitializer).Assembly) as AssemblyLoadContext;
 
             if (loadContext != null && loadContext.IsCollectible)
             {
@@ -89,6 +108,51 @@ namespace {{namespace}}.Generated
             AppDomain.CurrentDomain.AssemblyResolve += ResolveAssembly;
             
             IsAvailable = true;
+
+            List<Assembly> autoLoadedAssemblies = new List<Assembly>();
+            RegisterEmbeddedAssemblies(Assembly.GetExecutingAssembly(), loadContext, autoLoadedAssemblies);
+
+            // We cannot necessarily use the ModuleInitializer attribute for all libs, mainly Jellyfin.Plugin.Referenceable
+            // because its also an analyzer, so we give the dev an opportunity to invoke it another way by naming their function
+            // "ModuleInitializer" instead.
+            var moduleInitializers = autoLoadedAssemblies.SelectMany(x => x.GetTypes())
+                .SelectMany(x => x.GetMethods(BindingFlags.Static | BindingFlags.Public))
+                .Where(x => x.Name == "ModuleInitializer" || x.GetCustomAttribute<ModuleInitializerAttribute>() != null);
+
+            foreach (var moduleInitializer in moduleInitializers)
+            {
+                moduleInitializer.Invoke(null, new object[] { });
+            }
+        }
+
+        private static void RegisterEmbeddedAssemblies(Assembly assembly, AssemblyLoadContext assemblyLoadContext, List<Assembly> outAutoLoadedAssemblies)
+        {
+            string[] embeddedDlls = assembly.GetManifestResourceNames().Where(x => x.EndsWith(".dll")).ToArray();
+
+            foreach (string embeddedDll in embeddedDlls)
+            {
+                using var assemblyStream = assembly.GetManifestResourceStream(embeddedDll);
+                using MemoryStream memoryStream = new MemoryStream();
+                assemblyStream.CopyTo(memoryStream);
+                
+                string tmpDllLocation = $"{Path.GetTempFileName()}.dll";
+                
+                File.WriteAllBytes(tmpDllLocation, memoryStream.ToArray());
+                
+                AssemblyName assemblyName = AssemblyName.GetAssemblyName(tmpDllLocation);
+                
+                Console.WriteLine($"Registering assembly {assemblyName.FullName}");
+                RegisterAssembly(assemblyName.FullName, assembly, embeddedDll);
+                
+                File.Delete(tmpDllLocation);
+                
+                Console.WriteLine($"Attempt to auto load assembly {assemblyName.FullName}");
+                Assembly loadedAssembly = assemblyLoadContext.LoadFromAssemblyName(assemblyName);
+
+                outAutoLoadedAssemblies.Add(loadedAssembly);
+                
+                RegisterEmbeddedAssemblies(loadedAssembly, assemblyLoadContext, outAutoLoadedAssemblies);
+            }
         }
         
         public static bool IsInReferenceableContext<T>()
@@ -98,6 +162,8 @@ namespace {{namespace}}.Generated
 
         private static Assembly? ResolveAssembly(object? sender, ResolveEventArgs args)
         {
+            Console.WriteLine($"Attempting to resolve assembly with name '{args.Name}'");
+            
             AssemblyLoadContext thisLoadContext = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly())!;
             
             if (s_assemblyCache.ContainsKey(args.Name))

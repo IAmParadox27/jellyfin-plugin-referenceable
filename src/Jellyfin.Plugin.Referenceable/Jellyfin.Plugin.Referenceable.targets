@@ -6,31 +6,10 @@
     <ItemGroup>
         <PackageReference Include="Jellyfin.Model" Version="$(JellyfinVersion)" />
         <PackageReference Include="Jellyfin.Controller" Version="$(JellyfinVersion)" />
-
-        <PackageReference Include="ILRepack.Lib.MSBuild.Task" Version="2.0.34.2" PrivateAssets="all" />
-        <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
-
-        <PackageReference Include="Microsoft.NetCore.App.Ref" Version="8.0.0" ExcludeAssets="all" PrivateAssets="all" GeneratePathProperty="true" />
     </ItemGroup>
     
-    <!-- This is where we use ILRepack -->
-    <Target Name="ILRepacker" AfterTargets="Build">
-        <ItemGroup>
-            <InputAssemblies Include="$(OutputPath)\*.dll" />
-        </ItemGroup>
-        <ItemGroup>
-            <LibraryPath Include="$(PkgMicrosoft_NetCore_App_Ref)\ref\net8.0" />
-        </ItemGroup>
-        <ILRepack Condition="$(EnableRepack) != 'false'"
-            InputAssemblies="@(InputAssemblies)"
-            LibraryPath="@(LibraryPath)"
-            OutputFile="$(OutputPath)\$(AssemblyName).dll"
-            DebugInfo="true"
-            CopyAttributes="false"
-            XmlDocumentation="true"
-            Parallel="true"
-            TargetKind="Dll"
-            Wildcards="true"
-        />
-    </Target>
+    <ItemGroup Condition="Exists($(PkgJellyfin_Plugin_Referenceable))">
+        <None Include="$(PkgJellyfin_Plugin_Referenceable)\lib\net8.0\Jellyfin.Plugin.Referenceable.dll" />
+        <EmbeddedResource Include="$(PkgJellyfin_Plugin_Referenceable)\lib\net8.0\Jellyfin.Plugin.Referenceable.dll" />
+    </ItemGroup>
 </Project>
