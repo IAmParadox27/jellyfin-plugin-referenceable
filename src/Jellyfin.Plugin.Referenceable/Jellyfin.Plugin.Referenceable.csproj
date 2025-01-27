@@ -11,7 +11,7 @@
         <RepositoryUrl>https://github.com/IAmParadox27/jellyfin-plugin-referenceable</RepositoryUrl>
         <RepositoryType>GitHub</RepositoryType>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <Version>1.0.1</Version>
+        <Version>1.0.1-alpha.4</Version>
     </PropertyGroup>
 
     <ItemGroup>
@@ -35,6 +35,18 @@
         <HintPath>libs\Jellyfin\jellyfin.dll</HintPath>
         <Private>False</Private>
       </Reference>
+
+      <Reference Include="Jellyfin.Api">
+        <HintPath>C:\Program Files\Jellyfin\Server\Jellyfin.Api.dll</HintPath>
+      </Reference>
+
+      <Reference Include="Prometheus.AspNetCore">
+        <HintPath>C:\Program Files\Jellyfin\Server\Prometheus.AspNetCore.dll</HintPath>
+      </Reference>
+
+      <Reference Include="Prometheus.NetStandard">
+        <HintPath>C:\Program Files\Jellyfin\Server\Prometheus.NetStandard.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
     <ItemGroup>
@@ -57,6 +69,12 @@
     <Target Name="NuGetOutputCopy" AfterTargets="Pack">
         <!-- This command is just useful to ensure that all nupkg files are in the same place to make it easier to reference them from 1 local dir. -->
         <Exec Command="copy $(OutDir)..\$(ProjectName).*.nupkg $(SolutionDir)nuget-packages\" Condition="Exists($(SolutionDir))" />
+    </Target>
+    
+    <Target Name="RefreshNuGetBuild" AfterTargets="Pack" Condition="Exists($(SolutionPath))">
+        <Exec Command="rmdir $(NuGetPackageRoot)jellyfin.plugin.referenceable\$(Version) /S /Q" />
+        <Exec Command="mkdir $(NuGetPackageRoot)jellyfin.plugin.referenceable\$(Version)" />
+        <Exec Command="dotnet restore $(SolutionPath)" />
     </Target>
 
 </Project>

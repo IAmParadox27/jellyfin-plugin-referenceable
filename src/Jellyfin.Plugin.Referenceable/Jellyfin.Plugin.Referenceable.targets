@@ -1,11 +1,7 @@
 ﻿<Project>
-    <PropertyGroup>
-        <JellyfinVersion>10.10.3</JellyfinVersion>
-    </PropertyGroup>
-    
     <ItemGroup>
-        <PackageReference Include="Jellyfin.Model" Version="$(JellyfinVersion)" />
-        <PackageReference Include="Jellyfin.Controller" Version="$(JellyfinVersion)" />
+        <PackageReference Include="Jellyfin.Model" Version="10.10.3" />
+        <PackageReference Include="Jellyfin.Controller" Version="10.10.3" />
     </ItemGroup>
     
     <ItemGroup Condition="Exists($(PkgJellyfin_Plugin_Referenceable))">
