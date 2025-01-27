@@ -27,8 +27,10 @@
 
       <PackageReference Include="Jellyfin.Model" Version="10.10.3" />
       <PackageReference Include="Jellyfin.Controller" Version="10.10.3" PrivateAssets="All" />
+      
       <Reference Include="Emby.Server.Implementations">
         <HintPath>libs\Jellyfin\Emby.Server.Implementations.dll</HintPath>
+        <Private>False</Private>
       </Reference>
 
       <Reference Include="jellyfin">
@@ -37,15 +39,18 @@
       </Reference>
 
       <Reference Include="Jellyfin.Api">
-        <HintPath>C:\Program Files\Jellyfin\Server\Jellyfin.Api.dll</HintPath>
+        <HintPath>libs\Jellyfin\Jellyfin.Api.dll</HintPath>
+        <Private>False</Private>
       </Reference>
 
       <Reference Include="Prometheus.AspNetCore">
-        <HintPath>C:\Program Files\Jellyfin\Server\Prometheus.AspNetCore.dll</HintPath>
+        <HintPath>libs\Jellyfin\Prometheus.AspNetCore.dll</HintPath>
+        <Private>False</Private>
       </Reference>
 
       <Reference Include="Prometheus.NetStandard">
-        <HintPath>C:\Program Files\Jellyfin\Server\Prometheus.NetStandard.dll</HintPath>
+        <HintPath>libs\Jellyfin\Prometheus.NetStandard.dll</HintPath>
+        <Private>False</Private>
       </Reference>
     </ItemGroup>
 
