@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.IO;
+using System.Diagnostics;
 using System.Reflection;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -17,23 +19,26 @@ namespace Jellyfin.Plugin.Referenceable
 
         public void Execute(GeneratorExecutionContext context)
         {
-            using Stream? resourceStreamModuleInitializer = Assembly.GetExecutingAssembly().GetManifestResourceStream($"{typeof(ModuleInitGenerator).Namespace}.GeneratorTemplates.ModuleInitializer.cs");
-            using Stream? resourceStreamServiceRegistrator = Assembly.GetExecutingAssembly().GetManifestResourceStream($"{typeof(ModuleInitGenerator).Namespace}.GeneratorTemplates.ServiceRegistrator.cs");
-
-            if (resourceStreamModuleInitializer != null)
+            using (Stream resourceStreamModuleInitializer = Assembly.GetExecutingAssembly().GetManifestResourceStream($"{typeof(ModuleInitGenerator).Namespace}.GeneratorTemplates.ModuleInitializer.cs"))
+            using (Stream resourceStreamServiceRegistrator = Assembly.GetExecutingAssembly().GetManifestResourceStream($"{typeof(ModuleInitGenerator).Namespace}.GeneratorTemplates.ServiceRegistrator.cs"))
             {
-                using StreamReader reader = new StreamReader(resourceStreamModuleInitializer, Encoding.UTF8);
-            
-                context.AddSource("ModuleInitializer.g.cs", SourceText.From(reader.ReadToEnd()
-                    .Replace("{{namespace}}", context.Compilation.Assembly.Name), Encoding.UTF8));
-            }
+                if (resourceStreamModuleInitializer != null)
+                {
+                    using (StreamReader reader = new StreamReader(resourceStreamModuleInitializer, Encoding.UTF8))
+                    {
+                        context.AddSource("ModuleInitializer.g.cs", SourceText.From(reader.ReadToEnd()
+                            .Replace("{{namespace}}", context.Compilation.Assembly.Name), Encoding.UTF8));
+                    }
+                }
 
-            if (resourceStreamServiceRegistrator != null)
-            {
-                using StreamReader reader = new StreamReader(resourceStreamServiceRegistrator, Encoding.UTF8);
-            
-                context.AddSource("ServiceRegistrator.g.cs", SourceText.From(reader.ReadToEnd()
-                    .Replace("{{namespace}}", context.Compilation.Assembly.Name), Encoding.UTF8));
+                if (resourceStreamServiceRegistrator != null)
+                {
+                    using (StreamReader reader = new StreamReader(resourceStreamServiceRegistrator, Encoding.UTF8))
+                    {
+                        context.AddSource("ServiceRegistrator.g.cs", SourceText.From(reader.ReadToEnd()
+                            .Replace("{{namespace}}", context.Compilation.Assembly.Name), Encoding.UTF8));
+                    }
+                }
             }
         }
     }
