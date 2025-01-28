@@ -17,6 +17,11 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
     
+    <PropertyGroup Condition="$(TargetFramework) == 'netstandard2.0'">
+        <DebugSymbols>false</DebugSymbols>
+        <DebugType>None</DebugType>
+    </PropertyGroup>
+    
     <ItemGroup Condition="$(TargetFramework) == 'netstandard2.0'">
       <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.8.0" PrivateAssets="all" GeneratePathProperty="true" />
       <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" PrivateAssets="all" />
