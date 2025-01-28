@@ -4,7 +4,7 @@ using MediaBrowser.Controller.Plugins;
 using Microsoft.Extensions.DependencyInjection;
 using {{namespace}}.Generated;
 
-namespace Jellyfin.Plugin.Referenceable.Services
+namespace {{namespace}}.Services
 {
     public abstract class PluginServiceRegistrator : IPluginServiceRegistrator
     {
