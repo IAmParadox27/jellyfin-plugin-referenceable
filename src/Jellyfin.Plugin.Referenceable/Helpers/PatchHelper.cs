@@ -80,25 +80,26 @@ namespace Jellyfin.Plugin.Referenceable.Helpers
             }
         }
 
-        private static bool Patch_ServerApplicationHost_GetApiPluginAssemblies(ref IEnumerable<Assembly> __result, Type[] ____allConcreteTypes)
+        private static void Patch_ServerApplicationHost_GetApiPluginAssemblies(ref Type[] ____allConcreteTypes)
         {
-            // Get the original result back.
-            var assemblies = ____allConcreteTypes
-                .Where(i => typeof(ControllerBase).IsAssignableFrom(i))
-                .Select(i => i.Assembly)
-                .Distinct();
+            // This is the earliest point we can replace the _allConcreteTypes array with the correct values.
+            AssemblyLoadContext refPluginLoadContext = AssemblyLoadContext.GetLoadContext(Assembly.GetExecutingAssembly());
+            
+            IEnumerable<Type> newPotentialConcreteTypes = refPluginLoadContext.Assemblies
+                .SelectMany(x => x.GetExportedTypes())
+                .Where(x => x.IsClass && !x.IsAbstract && !x.IsInterface && !x.IsGenericType);
+            
+            List<Type> concreteTypes = new List<Type>();
+            concreteTypes.AddRange(____allConcreteTypes);
+            concreteTypes.AddRange(newPotentialConcreteTypes);
 
-            // Group the assemblies by their name.
-            var groupedAssemblies = assemblies.GroupBy(x => x.FullName);
-
-            // Do some logic to return a non-collectible assembly if there is one
-            // Otherwise return the only one, or first in the case of multiple
-            // collectible's.
-            var finalAssemblies = groupedAssemblies.Select(x =>
+            IEnumerable<IGrouping<string?, Type>> groupedTypes = concreteTypes.GroupBy(x => x.FullName);
+            
+            IEnumerable<Type> finalTypes = groupedTypes.Select(x =>
             {
-                if (x.Any(y => !y.IsCollectible))
+                if (x.Any(y => !y.Assembly.IsCollectible))
                 {
-                    return x.First(y => !y.IsCollectible);
+                    return x.First(y => !y.Assembly.IsCollectible);
                 }
 
                 if (x.Count() == 1)
@@ -113,12 +114,8 @@ namespace Jellyfin.Plugin.Referenceable.Helpers
 
                 return null;
             }).Where(x => x != null).Select(x => x!);
-            
-            // Update the return value.
-            __result = finalAssemblies;
-            
-            // Don't execute the original code.
-            return false;
+
+            ____allConcreteTypes = finalTypes.ToArray();
         }
     }
 }
