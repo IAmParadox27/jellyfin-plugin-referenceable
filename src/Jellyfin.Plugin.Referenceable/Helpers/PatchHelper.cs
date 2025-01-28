@@ -1,9 +1,11 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.Loader;
+using Emby.Server.Implementations;
 using Emby.Server.Implementations.Plugins;
 using HarmonyLib;
 using Jellyfin.Server;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Jellyfin.Plugin.Referenceable.Helpers
 {
@@ -19,6 +21,8 @@ namespace Jellyfin.Plugin.Referenceable.Helpers
             HarmonyMethod createPluginInstanceMethod = new HarmonyMethod(typeof(PatchHelper).GetMethod(nameof(Patch_PluginManager_CreatePluginInstance), BindingFlags.Static | BindingFlags.NonPublic));
 
             HarmonyMethod configureStartupPatchMethod = new HarmonyMethod(typeof(StartupHelper).GetMethod(nameof(StartupHelper.Patch_Startup_Configure), BindingFlags.NonPublic | BindingFlags.Static));
+
+            HarmonyMethod getApiPluginAssembliesMethod = new HarmonyMethod(typeof(PatchHelper).GetMethod(nameof(Patch_ServerApplicationHost_GetApiPluginAssemblies), BindingFlags.Static | BindingFlags.NonPublic));
             
             // Setup a patch to stop calls to patch functions when the call has come from another assembly.
             s_harmony.Patch(typeof(Harmony).GetMethod(nameof(Harmony.Patch)), 
@@ -34,6 +38,11 @@ namespace Jellyfin.Plugin.Referenceable.Helpers
             // as there are more requirements this will update to include those too.
             s_harmony.Patch(typeof(Startup).GetMethod(nameof(Startup.Configure)),
                 prefix: configureStartupPatchMethod);
+            
+            // We patch the ApplicationHost.GetApiPluginAssemblies function to allow us to change the assemblies that are
+            // returned for assemblies that have been reloaded into our collectible context.
+            s_harmony.Patch(typeof(ApplicationHost).GetMethod(nameof(ApplicationHost.GetApiPluginAssemblies)),
+                prefix: getApiPluginAssembliesMethod);
         }
 
         private static bool Patch_Harmony_Patch(MethodBase original, HarmonyMethod? prefix = null,
@@ -69,6 +78,47 @@ namespace Jellyfin.Plugin.Referenceable.Helpers
                     type = replacementType;
                 }
             }
+        }
+
+        private static bool Patch_ServerApplicationHost_GetApiPluginAssemblies(ref IEnumerable<Assembly> __result, Type[] ____allConcreteTypes)
+        {
+            // Get the original result back.
+            var assemblies = ____allConcreteTypes
+                .Where(i => typeof(ControllerBase).IsAssignableFrom(i))
+                .Select(i => i.Assembly)
+                .Distinct();
+
+            // Group the assemblies by their name.
+            var groupedAssemblies = assemblies.GroupBy(x => x.FullName);
+
+            // Do some logic to return a non-collectible assembly if there is one
+            // Otherwise return the only one, or first in the case of multiple
+            // collectible's.
+            var finalAssemblies = groupedAssemblies.Select(x =>
+            {
+                if (x.Any(y => !y.IsCollectible))
+                {
+                    return x.First(y => !y.IsCollectible);
+                }
+
+                if (x.Count() == 1)
+                {
+                    return x.Single();
+                }
+
+                if (x.Any())
+                {
+                    return x.First();
+                }
+
+                return null;
+            }).Where(x => x != null).Select(x => x!);
+            
+            // Update the return value.
+            __result = finalAssemblies;
+            
+            // Don't execute the original code.
+            return false;
         }
     }
 }
