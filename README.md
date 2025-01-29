@@ -45,6 +45,14 @@ Add `Jellyfin.Plugin.Referenceable` from NuGet from at least version `1.0.6`. Al
 - This library brings a library called `0Harmony` into the Jellyfin instance. This is a patching library which allows developers to patch existing functionality using reflection. Care has been taken to ensure that patches can only be performed from this assembly and nothing else.
 - This library will be an embedded resource inside all plugins that reference it and will be self injected. Plugin's that use this will see their dll size increase by approximately 2MB.
 
+## Noting the version required
+
+On your GitHub page you can put an image shield like this <img alt="Shield Example" src="https://img.shields.io/badge/JF%20Referenceable-v1.0.6-blue" /> to signify what version of this library you require.
+
+```html
+<img alt="Shield Example" src="https://img.shields.io/badge/JF%20Referenceable-v1.0.6-blue" />
+```
+
 ## Requests
 If any functionality is desired to be overridden from Jellyfin's server please open a `feature-request` issue on GitHub.
 
