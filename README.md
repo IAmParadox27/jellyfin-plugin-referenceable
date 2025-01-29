@@ -12,6 +12,9 @@
 	<a href="https://github.com/IAmParadox27/jellyfin-plugin-home-sections/releases">
 		<img alt="Current Release" src="https://img.shields.io/github/release/IAmParadox27/jellyfin-plugin-referenceable.svg" />
 	</a>
+	<a href="https://www.nuget.org/packages/Jellyfin.Plugin.Referenceable">
+		<img alt="NuGet Release" src="https://img.shields.io/nuget/v/Jellyfin.Plugin.Referenceable" />
+	</a>
 </p>
 
 ## Introduction
