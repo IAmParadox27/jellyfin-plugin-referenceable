@@ -4,6 +4,7 @@
         <TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <GenerateNuspecDependsOn>$(GenerateNuspecDependsOn);_ExcludeTargetFramework;_ExcludeTargetFrameworkDependency</GenerateNuspecDependsOn>
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
         <PackageProjectUrl>https://projects.iamparadox.dev/en/jellyfin-plugins/referenceable</PackageProjectUrl>
         <RepositoryUrl>https://github.com/IAmParadox27/jellyfin-plugin-referenceable</RepositoryUrl>
@@ -12,6 +13,18 @@
         <Version>1.0.1-alpha.4</Version>
     </PropertyGroup>
 
+    <Target Name="_ExcludeTargetFramework" AfterTargets="_GetTargetFrameworksOutput" BeforeTargets="_WalkEachTargetPerFramework">
+        <ItemGroup>
+            <_TargetFrameworks Remove="netstandard2.0" />
+        </ItemGroup>
+    </Target>
+
+    <Target Name="_ExcludeTargetFrameworkDependency" AfterTargets="_WalkEachTargetPerFramework" BeforeTargets="GenerateNuspec">
+        <ItemGroup>
+            <_FrameworksWithSuppressedDependencies Include="netstandard2.0" />
+        </ItemGroup>
+    </Target>
+    
     <PropertyGroup Condition="$(TargetFramework) == 'net8.0'">
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
