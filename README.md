@@ -29,10 +29,17 @@ The use cases for this can be seen in my other plugins [file-transformation](htt
 - The library **must** be referenced by NuGet not DLL directly. This is due to source generators and targets files being present which only work through NuGet references.
 
 ### Referencing this library
-Add `Jellyfin.Plugin.Referenceable` from NuGet from at least version `1.0.6`. All versions previous to this do not work correctly and have issues which were only discovered after making the release. `OutputItemType` and `GeneratePathProperty` must both be set on the reference. You can use the `<PackageReference>` line below to ensure you are referencing in the correct way.
+Add `Jellyfin.Plugin.Referenceable` from NuGet from at least version `1.1.0`. All versions previous to this do not work correctly and have issues which were only discovered after making the release. `OutputItemType` and `GeneratePathProperty` must both be set on the reference. You can use the `<PackageReference>` line below to ensure you are referencing in the correct way.
 
 ```xml
-<PackageReference Include="Jellyfin.Plugin.Referenceable" Version="1.0.6" OutputItemType="Analyzer" GeneratePathProperty="true" />
+<PackageReference Include="Jellyfin.Plugin.Referenceable" Version="1.1.0" OutputItemType="Analyzer" GeneratePathProperty="true" />
+```
+
+Since this package generates code that makes use of `Jellyfin.Model` and `Jellyfin.Controller` packages you will also need to ensure that you have the following packages included.
+
+```xml
+<PackageReference Include="Jellyfin.Model" Version="10.10.3" />
+<PackageReference Include="Jellyfin.Controller" Version="10.10.3" />
 ```
 
 ### Changes from normal plugin development
@@ -47,10 +54,10 @@ Add `Jellyfin.Plugin.Referenceable` from NuGet from at least version `1.0.6`. Al
 
 ## Noting the version required
 
-On your GitHub page you can put an image shield like this <img alt="Shield Example" src="https://img.shields.io/badge/JF%20Referenceable-v1.0.6-blue" /> to signify what version of this library you require.
+On your GitHub page you can put an image shield like this <img alt="Shield Example" src="https://img.shields.io/badge/JF%20Referenceable-v1.1.0-blue" /> to signify what version of this library you require.
 
 ```html
-<img alt="Shield Example" src="https://img.shields.io/badge/JF%20Referenceable-v1.0.6-blue" />
+<img alt="Shield Example" src="https://img.shields.io/badge/JF%20Referenceable-v1.1.0-blue" />
 ```
 
 ## Requests
