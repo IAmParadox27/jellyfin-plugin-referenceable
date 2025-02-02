@@ -10,7 +10,7 @@
         <RepositoryUrl>https://github.com/IAmParadox27/jellyfin-plugin-referenceable</RepositoryUrl>
         <RepositoryType>GitHub</RepositoryType>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <Version>1.0.1-alpha.4</Version>
+        <Version>1.2.0</Version>
     </PropertyGroup>
 
     <Target Name="_ExcludeTargetFramework" AfterTargets="_GetTargetFrameworksOutput" BeforeTargets="_WalkEachTargetPerFramework">
@@ -48,8 +48,8 @@
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
 
-      <PackageReference Include="Jellyfin.Model" Version="10.10.3" />
-      <PackageReference Include="Jellyfin.Controller" Version="10.10.3" PrivateAssets="All" />
+      <PackageReference Include="Jellyfin.Model" Version="10.10.5" />
+      <PackageReference Include="Jellyfin.Controller" Version="10.10.5" PrivateAssets="All" />
       
       <Reference Include="Emby.Server.Implementations">
         <HintPath>libs\Jellyfin\Emby.Server.Implementations.dll</HintPath>

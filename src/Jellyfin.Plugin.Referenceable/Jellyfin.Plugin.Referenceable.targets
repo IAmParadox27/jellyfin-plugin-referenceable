@@ -1,7 +1,7 @@
 ﻿<Project>
     <ItemGroup>
-        <PackageReference Update="Jellyfin.Model" Version="10.10.3" />
-        <PackageReference Update="Jellyfin.Controller" Version="10.10.3" />
+        <PackageReference Update="Jellyfin.Model" Version="10.10.5" />
+        <PackageReference Update="Jellyfin.Controller" Version="10.10.5" />
     </ItemGroup>
     
     <ItemGroup Condition="Exists($(PkgJellyfin_Plugin_Referenceable))">
