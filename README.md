@@ -24,12 +24,22 @@ The use cases for this can be seen in my other plugins [file-transformation](htt
 
 ## Installation
 
+### Which Version?
+| Referenceable | Jellyfin |
+|---------------|----------|
+| 1.1.0         | 10.10.3  |
+| 1.2.0         | 10.10.5  |
+
+_There is no version for 10.10.4 as this was only the latest version for 1 day before 10.10.5 was released._
+
 ### Prerequisites
-- This plugin is based on Jellyfin Version `10.10.3`. Updates will follow to bring support to `10.10.4` and `10.10.5` which were both released during early development of the library.
+- The latest version of this plugin is based on Jellyfin Version `10.10.5`.
 - The library **must** be referenced by NuGet not DLL directly. This is due to source generators and targets files being present which only work through NuGet references.
 
 ### Referencing this library
-Add `Jellyfin.Plugin.Referenceable` from NuGet from at least version `1.1.0`. All versions previous to this do not work correctly and have issues which were only discovered after making the release. `OutputItemType` and `GeneratePathProperty` must both be set on the reference. You can use the `<PackageReference>` line below to ensure you are referencing in the correct way.
+Add `Jellyfin.Plugin.Referenceable` from NuGet using the version most applicable from the table above. All versions previous to 1.1.0 do not work correctly and have issues which were only discovered after making the release. 
+
+`OutputItemType` and `GeneratePathProperty` must both be set on the reference. You can use the `<PackageReference>` line below to ensure you are referencing in the correct way.
 
 ```xml
 <PackageReference Include="Jellyfin.Plugin.Referenceable" Version="1.1.0" OutputItemType="Analyzer" GeneratePathProperty="true" />
@@ -38,8 +48,8 @@ Add `Jellyfin.Plugin.Referenceable` from NuGet from at least version `1.1.0`. Al
 Since this package generates code that makes use of `Jellyfin.Model` and `Jellyfin.Controller` packages you will also need to ensure that you have the following packages included.
 
 ```xml
-<PackageReference Include="Jellyfin.Model" Version="10.10.3" />
-<PackageReference Include="Jellyfin.Controller" Version="10.10.3" />
+<PackageReference Include="Jellyfin.Model" Version="10.10.5" />
+<PackageReference Include="Jellyfin.Controller" Version="10.10.5" />
 ```
 
 ### Changes from normal plugin development
@@ -54,10 +64,10 @@ Since this package generates code that makes use of `Jellyfin.Model` and `Jellyf
 
 ## Noting the version required
 
-On your GitHub page you can put an image shield like this <img alt="Shield Example" src="https://img.shields.io/badge/JF%20Referenceable-v1.1.0-blue" /> to signify what version of this library you require.
+On your GitHub page you can put an image shield like this <img alt="Shield Example" src="https://img.shields.io/badge/JF%20Referenceable-v1.2.0-blue" /> to signify what version of this library you require.
 
 ```html
-<img alt="Shield Example" src="https://img.shields.io/badge/JF%20Referenceable-v1.1.0-blue" />
+<img alt="Shield Example" src="https://img.shields.io/badge/JF%20Referenceable-v1.2.0-blue" />
 ```
 
 ## Requests
