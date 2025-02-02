@@ -10,7 +10,7 @@
         <RepositoryUrl>https://github.com/IAmParadox27/jellyfin-plugin-referenceable</RepositoryUrl>
         <RepositoryType>GitHub</RepositoryType>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <Version>1.2.0</Version>
+        <Version>1.2.1</Version>
     </PropertyGroup>
 
     <Target Name="_ExcludeTargetFramework" AfterTargets="_GetTargetFrameworksOutput" BeforeTargets="_WalkEachTargetPerFramework">
@@ -51,21 +51,6 @@
       <PackageReference Include="Jellyfin.Model" Version="10.10.5" />
       <PackageReference Include="Jellyfin.Controller" Version="10.10.5" PrivateAssets="All" />
       
-      <Reference Include="Emby.Server.Implementations">
-        <HintPath>libs\Jellyfin\Emby.Server.Implementations.dll</HintPath>
-        <Private>False</Private>
-      </Reference>
-
-      <Reference Include="jellyfin">
-        <HintPath>libs\Jellyfin\jellyfin.dll</HintPath>
-        <Private>False</Private>
-      </Reference>
-
-      <Reference Include="Jellyfin.Api">
-        <HintPath>libs\Jellyfin\Jellyfin.Api.dll</HintPath>
-        <Private>False</Private>
-      </Reference>
-
       <Reference Include="Prometheus.AspNetCore">
         <HintPath>libs\Jellyfin\Prometheus.AspNetCore.dll</HintPath>
         <Private>False</Private>
@@ -93,6 +78,7 @@
         <Compile Remove="InternalModuleInitializer.cs" />
         <Compile Remove="Helpers\PatchHelper.cs" />
         <Compile Remove="Helpers\StartupHelper.cs" />
+        <Compile Remove="Extensions\JellyfinDllExtensions.cs" />
 
         <EmbeddedResource Include="GeneratorTemplates\ModuleInitializer.cs" />
         <EmbeddedResource Include="GeneratorTemplates\ServiceRegistrator.cs" />

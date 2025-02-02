@@ -1,8 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Net.Mime;
 using System.Reflection;
-using Jellyfin.Api.Middleware;
-using Jellyfin.Server.Extensions;
+using Jellyfin.Plugin.Referenceable.Extensions;
 using MediaBrowser.Common.Net;
 using MediaBrowser.Controller;
 using MediaBrowser.Controller.Configuration;
@@ -62,6 +61,8 @@ namespace Jellyfin.Plugin.Referenceable.Helpers
         internal static bool Patch_Startup_Configure(IApplicationBuilder app, IWebHostEnvironment env,
             IConfiguration appConfig, ref object __instance)
         {
+            Assembly? jellyfinApiAssembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(x => x.FullName?.Contains("Jellyfin.Api") ?? false);
+            
             FieldInfo? serverConfigurationManagerInfo = __instance.GetType().GetField("_serverConfigurationManager", BindingFlags.Instance | BindingFlags.NonPublic) ?? throw new ArgumentNullException("__instance.GetType().GetField(\"_serverConfigurationManager\", BindingFlags.Instance | BindingFlags.NonPublic)");
             FieldInfo? serverApplicationHostInfo = __instance.GetType().GetField("_serverApplicationHost", BindingFlags.Instance | BindingFlags.NonPublic) ?? throw new ArgumentNullException("__instance.GetType().GetField(\"_serverApplicationHost\", BindingFlags.Instance | BindingFlags.NonPublic)");
 
@@ -80,9 +81,25 @@ namespace Jellyfin.Plugin.Referenceable.Helpers
                 }
 
                 mainApp.UseForwardedHeaders();
-                mainApp.UseMiddleware<ExceptionMiddleware>();
 
-                mainApp.UseMiddleware<ResponseTimeMiddleware>();
+                // JF Divergence
+                if (jellyfinApiAssembly != null)
+                {
+                    //mainApp.UseMiddleware<ExceptionMiddleware>();
+                    Type? exceptionMiddlewareType = jellyfinApiAssembly.GetType("ExceptionMiddleware");
+                    if (exceptionMiddlewareType != null)
+                    {
+                        mainApp.UseMiddleware(exceptionMiddlewareType);
+                    }
+
+                    //mainApp.UseMiddleware<ResponseTimeMiddleware>();
+                    Type? responseTimeMiddlewareType = jellyfinApiAssembly.GetType("ResponseTimeMiddleware");
+                    if (responseTimeMiddlewareType != null)
+                    {
+                        mainApp.UseMiddleware(responseTimeMiddlewareType);
+                    }
+                }
+                // ~JF Divergence
 
                 mainApp.UseWebSockets();
 

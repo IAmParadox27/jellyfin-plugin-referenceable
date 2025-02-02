@@ -1,11 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.Loader;
-using Emby.Server.Implementations;
-using Emby.Server.Implementations.Plugins;
 using HarmonyLib;
-using Jellyfin.Server;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Jellyfin.Plugin.Referenceable.Helpers
 {
@@ -30,18 +26,21 @@ namespace Jellyfin.Plugin.Referenceable.Helpers
             
             // We need to make sure that the plugin instance of a referenceable plugin is created from the non collectible assembly,
             // so we patch this to change the type to the non collectible one where its available.
-            s_harmony.Patch(typeof(PluginManager).GetMethod("CreatePluginInstance", BindingFlags.NonPublic | BindingFlags.Instance),
+            Type pluginManagerType = AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes()).FirstOrDefault(x => x.Name == "PluginManager")!;
+            s_harmony.Patch(pluginManagerType.GetMethod("CreatePluginInstance", BindingFlags.NonPublic | BindingFlags.Instance),
                 prefix: createPluginInstanceMethod);
             
             // We patch the Startup.Configure function to allow things to be changed while the app is being setup.
             // Currently the only configurable element is the FileProvider for Default/Static files for /web but 
             // as there are more requirements this will update to include those too.
-            s_harmony.Patch(typeof(Startup).GetMethod(nameof(Startup.Configure)),
+            Type startupType = AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes()).FirstOrDefault(x => x.Name == "Startup")!;
+            s_harmony.Patch(startupType.GetMethod("Configure"),
                 prefix: configureStartupPatchMethod);
             
             // We patch the ApplicationHost.GetApiPluginAssemblies function to allow us to change the assemblies that are
             // returned for assemblies that have been reloaded into our collectible context.
-            s_harmony.Patch(typeof(ApplicationHost).GetMethod(nameof(ApplicationHost.GetApiPluginAssemblies)),
+            Type applicationHostType = AppDomain.CurrentDomain.GetAssemblies().SelectMany(x => x.GetTypes()).FirstOrDefault(x => x.Name == "ApplicationHost")!;
+            s_harmony.Patch(applicationHostType.GetMethod("GetApiPluginAssemblies"),
                 prefix: getApiPluginAssembliesMethod);
         }
 
