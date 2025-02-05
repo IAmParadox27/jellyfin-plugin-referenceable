@@ -29,7 +29,7 @@ namespace Jellyfin.Plugin.Referenceable.Helpers
             set
             {
                 // We only allow these to be set once.
-                if (s_webDefaultFilesFileProvider == null)
+                if (s_webDefaultFilesFileProvider == null || value == null)
                 {
                     s_webDefaultFilesFileProvider = value;
                 }
@@ -46,7 +46,7 @@ namespace Jellyfin.Plugin.Referenceable.Helpers
             set
             {
                 // We only allow these to be set once.
-                if (s_webStaticFilesFileProvider == null)
+                if (s_webStaticFilesFileProvider == null || value == null)
                 {
                     s_webStaticFilesFileProvider = value;
                 }
